@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="个人技术博客 QinIndexCode 技术栈">
+    <meta name="keywords" content="个人技术博客, QinIndexCode, 技术栈">
+    <meta name="author" content="QinIndexCode">
+    <meta name="robots" content="index, follow">
+    <!-- 图标 -->
+     <meta name="icon" content="./assets/favicon.ico">
     <title>技术栈 - 个人技术博客</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="./css/css2.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -62,7 +66,7 @@
             transform: translateX(-50%);
             width: 60px;
             height: 3px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-orange));
+            background: var(--gradient-primary);
         }
 
         /* 技术栈网格 */
@@ -92,7 +96,7 @@
             left: 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-orange));
+            background: var(--gradient-primary);
             transform: scaleX(0);
             transition: var(--transition);
         }
@@ -111,7 +115,7 @@
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
-            color: var(--accent-orange);
+            color: var(--accent-blue);
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -155,7 +159,7 @@
         }
 
         .tech-list li:hover::before {
-            color: var(--accent-orange);
+            color: var(--accent-blue);
         }
 
         /* 技能等级样式 */
@@ -163,7 +167,7 @@
             display: inline-block;
             margin-left: 0.5rem;
             font-size: 0.875rem;
-            color: var(--accent-orange);
+            color: var(--accent-blue);
             font-weight: 600;
         }
 

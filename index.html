@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人技术博客 - 云南开发者</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>个人技术博客 QinIndexCode</title>
+    <link href="./css/css2.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -69,6 +67,7 @@
         }
 
         .profile-avatar {
+            user-select: none;
             width: 100px;
             height: 100px;
             border-radius: 50%;
@@ -94,8 +93,8 @@
 
         .profile-avatar:hover {
             transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 0 25px rgba(37, 99, 235, 0.4);
-            border-color: var(--accent-orange);
+            box-shadow: 0 0 25px rgba(91, 94, 191, 0.4);
+            border-color: var(--accent-blue);
         }
 
         .profile-name {
@@ -340,8 +339,38 @@
             transform: scale(0.98);
         }
 
+        /* 汉堡菜单按钮样式 */
+        .hamburger-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: none;
+        }
+
+        .hamburger-btn:hover {
+            background: var(--bg-primary);
+            box-shadow: 0 0 15px rgba(91, 94, 191, 0.4);
+            border-color: var(--accent-blue);
+        }
+
+        .hamburger-btn:hover svg path {
+            stroke: var(--accent-blue);
+            filter: drop-shadow(0 0 8px rgba(91, 94, 191, 0.6));
+        }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
+            .hamburger-btn {
+                display: block;
+            }
+
             .main-container {
                 padding: 0.5rem;
                 gap: 0.5rem;
@@ -358,10 +387,22 @@
             .sidebar.active {
                 left: 0.5rem;
             }
+
+            /* 在移动设备上，内容区域占满屏幕 */
+            .content-area {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 汉堡菜单按钮 -->
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle sidebar">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12H21M3 6H21M3 18H21" stroke="var(--text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
     <div class="main-container">
         <!-- 左侧边栏 -->
         <aside class="sidebar" id="sidebar">
@@ -370,7 +411,7 @@
                 <div class="profile-avatar" id="avatar">
                     <img src="assets/images/avatar.jpg" alt="个人头像" id="avatar-img" onerror="this.style.display='none'; this.parentElement.innerHTML='💻'">
                 </div>
-                <div class="profile-name">QinZhiHeng</div>
+                <div class="profile-name">QinIndexCode</div>
                 <!-- 浮动文字元素 -->
                 <div class="floating-text" id="floating-text"></div>
             </div>
@@ -534,6 +575,24 @@
                 this.style.setProperty('--mouse-x', `${x}px`);
                 this.style.setProperty('--mouse-y', `${y}px`);
             });
+        });
+
+        // 汉堡菜单切换功能
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        hamburgerBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+
+        // 在移动设备上，点击内容区域时关闭侧边栏
+        document.addEventListener('click', function(e) {
+            const isMobile = window.innerWidth <= 768;
+            const isClickOutside = !sidebar.contains(e.target) && !hamburgerBtn.contains(e.target);
+            
+            if (isMobile && isClickOutside && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
         });
     </script>
 </body>

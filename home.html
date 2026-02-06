@@ -1,344 +1,81 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="QinIndexCode - 个人主页，专注于全栈开发领域">
-    <meta name="keywords" content="QinIndexCode, 个人主页, 全栈开发">
-    <title>首页 - 个人技术博客</title>
+    <meta name="description" content="QinIndexCode - 个人主页">
+    <title>首页</title>
     <link href="./css/css2.css" rel="stylesheet">
     <link href="./css/main.css" rel="stylesheet">
     <script src="./js/smooth-scroll.js" defer></script>
-    <style>
-        body {
-            background-color: var(--bg-secondary);
-        }
-
-        /* 英雄区样式 */
-        .hero {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: var(--spacing-xl);
-            align-items: center;
-            margin-bottom: var(--spacing-2xl);
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .hero-text h1 {
-            font-size: var(--font-size-4xl);
-            font-weight: 700;
-            margin-bottom: var(--spacing-lg);
-            line-height: 1.2;
-            letter-spacing: -0.02em;
-        }
-
-        .hero-text .highlight {
-            color: var(--accent-blue);
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-text p {
-            font-size: 1.125rem;
-            margin-bottom: 2rem;
-            color: var(--text-secondary);
-        }
-
-        .hero-stats {
-            display: flex;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-item {
-            text-align: center;
-            background-color: var(--bg-tertiary);
-            padding: var(--spacing-lg);
-            border-radius: var(--border-radius-lg);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateY(0);
-        }
-
-        .stat-item:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-xl), var(--shadow-glow);
-            border-color: var(--accent-blue);
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-blue);
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-            letter-spacing: 0.025em;
-        }
-
-        .hero-avatar {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.8s ease-out 0.2s both;
-        }
-
-        .avatar-wrapper {
-            width: 280px;
-            height: 280px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 4px solid var(--accent-blue);
-            box-shadow: 0 8px 25px rgba(91, 94, 191, 0.3);
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-                        border-color 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-                        box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
-            transform: scale(1) rotate(0deg);
-        }
-
-        .avatar-wrapper::before {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 50%;
-            background: var(--gradient-primary);
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .avatar-wrapper:hover::before {
-            opacity: 0.4;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .avatar-wrapper:hover {
-            transform: scale(1.12) rotate(5deg);
-            box-shadow: var(--shadow-glow-strong);
-            border-color: var(--accent-purple);
-        }
-
-        .avatar-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            transform: scale(1);
-        }
-
-        .avatar-wrapper:hover img {
-            transform: scale(1.08);
-        }
-
-        /* 简介区域 */
-        .intro {
-            background-color: var(--bg-tertiary);
-            padding: 2.5rem;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
-            margin-bottom: 4rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: fadeIn 0.6s ease-out 0.4s both;
-            transform: translateY(0);
-        }
-
-        .intro:hover {
-            box-shadow: var(--shadow-xl), var(--shadow-glow);
-            border-color: var(--accent-blue);
-            transform: translateY(-3px);
-        }
-
-        .intro h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--accent-blue);
-            letter-spacing: -0.01em;
-        }
-
-        .intro p {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            line-height: 1.8;
-        }
-
-        /* 核心技能区域 */
-        .skills {
-            margin-bottom: 4rem;
-            animation: fadeIn 0.6s ease-out 0.6s both;
-        }
-
-        .skills h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            color: var(--accent-blue);
-            text-align: center;
-            letter-spacing: -0.01em;
-        }
-
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .skill-item {
-            background-color: var(--bg-tertiary);
-            padding: var(--spacing-lg);
-            border-radius: var(--border-radius-lg);
-            border: 1px solid var(--border-color);
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateY(0);
-        }
-
-        .skill-item:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-xl), var(--shadow-glow);
-            border-color: var(--accent-blue);
-        }
-
-        /* 技能图标样式 */
-        .skill-icon {
-            width: 28px;
-            height: 28px;
-            margin-bottom: 0.875rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            filter: brightness(0.7);
-            transform: translateY(0) scale(1);
-        }
-
-        .skill-item:hover .skill-icon {
-            filter: brightness(1) drop-shadow(0 0 12px rgba(99, 102, 241, 0.6));
-            transform: translateY(-3px) scale(1.1);
-        }
-
-        .skill-item h3 {
-            font-size: 0.9375rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.025em;
-            color: var(--text-primary);
-        }
-
-        .skill-item p {
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-            letter-spacing: 0.0125em;
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 1024px) {
-            .hero {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .hero-stats {
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem;
-            }
-
-            .hero-text h1 {
-                font-size: 2rem;
-            }
-
-            .hero-stats {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .stat-item {
-                width: 100%;
-                max-width: 300px;
-            }
-
-            .skills-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-        }
-
-        @media (max-width: 375px) {
-            .hero-text h1 {
-                font-size: 1.75rem;
-            }
-
-            .avatar-wrapper {
-                width: 200px;
-                height: 200px;
-            }
-        }
-    </style>
 </head>
-
 <body>
     <div class="container">
-        <!-- 英雄区 -->
-        <section class="hero">
-            <div class="hero-text">
+        <!-- Hero Section -->
+        <section class="hero grid-2">
+            <div class="hero-content">
+                <p class="tagline">Hope the future is better!</p>
                 <h1>QinIndexCode</h1>
-                <p style="font-size: 0.7rem; text-align: center;">Hope the future is better!</p>
-                <p>专注于全栈开发领域。</p>
+                <p style="font-size: 1.125rem; margin-bottom: 2rem; max-width: 500px;">
+                    专注于全栈开发领域，致力于构建高性能、高可用的现代化 Web 应用。
+                </p>
+                
+                <div class="stats-grid">
+                    <div class="stat-item glass">
+                        <span class="stat-num">3+</span>
+                        <span class="stat-label">Years Exp</span>
+                    </div>
+                    <div class="stat-item glass">
+                        <span class="stat-num">20+</span>
+                        <span class="stat-label">Projects</span>
+                    </div>
+                    <div class="stat-item glass">
+                        <span class="stat-num">100%</span>
+                        <span class="stat-label">Passion</span>
+                    </div>
+                </div>
             </div>
-            <div class="hero-avatar">
-                <div class="avatar-wrapper">
-                    <img src="assets/images/avatar.jpg" alt="个人头像"
-                        onerror="this.style.display='none'; this.parentElement.innerHTML='💻'">
+            
+            <div class="hero-visual" style="display: flex; justify-content: center; width: 80%;">
+                <div class="avatar-wrapper" >
+                    <img src="assets/images/avatar.jpg" alt="Profile Avatar" width="280" height="280" loading="eager">
                 </div>
             </div>
         </section>
-
-        <!-- 个人简介 -->
-        <section class="intro">
-            <h2>关于</h2>
-            <p>主要从事Web与移动应用开发，接触过多种开发框架。</p>
-            <p>偶尔参与开源项目，保持学习与探索的习惯。</p>
+        <br>
+        <!-- Intro Section -->
+        <section class="card glass" style="margin-bottom: 4rem;">
+            <h2>关于我</h2>
+            <p>主要从事Web与移动应用开发，热衷于探索前沿技术。</p>
+            <p>从前端交互到后端架构，我享受用代码解决问题的过程。偶尔参与开源项目，保持学习与分享的习惯。</p>
         </section>
 
-        <!-- 核心技能 -->
-        <section class="skills">
-            <h2>技术栈</h2>
-            <div class="skills-grid">
-                <div class="skill-item">
-                    <img src="assets/icons/mobileDevice.svg" alt="移动开发" class="skill-icon">
-                    <h3>移动开发</h3>
-                    <p>React Native、Expo</p>
+        <!-- Skills Section -->
+        <section>
+            <h2 class="section-title">核心技术栈</h2>
+            <div class="grid-4 grid">
+                <div class="card glass skill-card">
+                    <img src="assets/icons/web.svg" alt="Web" class="skill-icon" width="48" height="48">
+                    <h3>Web 开发</h3>
+                    <p>Next.js, Vue3, Tailwind...</p>
                 </div>
-                <div class="skill-item">
-                    <img src="assets/icons/web.svg" alt="Web开发" class="skill-icon">
-                    <h3>Web开发</h3>
-                    <p>NextJS、React、Vue3</p>
+                <div class="card glass skill-card">
+                    <img src="assets/icons/mobileDevice.svg" alt="Mobile" class="skill-icon" width="48" height="48">
+                    <h3>移动端</h3>
+                    <p>React Native, Expo...</p>
                 </div>
-                <div class="skill-item">
-                    <img src="assets/icons/backEnd.svg" alt="后端开发" class="skill-icon">
-                    <h3>后端开发</h3>
-                    <p>Express、Laravel、Koa.js</p>
+                <div class="card glass skill-card">
+                    <img src="assets/icons/backEnd.svg" alt="Backend" class="skill-icon" width="48" height="48">
+                    <h3>后端</h3>
+                    <p>Node.js, Go, Python...</p>
                 </div>
-                <div class="skill-item">
-                    <img src="assets/icons/database.svg" alt="数据库" class="skill-icon">
+                <div class="card glass skill-card">
+                    <img src="assets/icons/database.svg" alt="DB" class="skill-icon" width="48" height="48">
                     <h3>数据库</h3>
-                    <p>MySQL、Prisma</p>
+                    <p>PostgreSQL, Redis...</p>
                 </div>
             </div>
         </section>
     </div>
 </body>
-
 </html>

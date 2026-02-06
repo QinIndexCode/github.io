@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="开发者工具箱 - 图片转换、二维码、JSON、Base64、时间戳、颜色转换等全能工具集">
+    <title>工具箱 - QinIndexCode</title>
+    <link href="./css/css2.css" rel="stylesheet">
+    <link href="./css/main.css" rel="stylesheet">
+    <!-- QR Code Library -->
+    <script src="./js/qrcode.min.js"></script>
+    <script src="./js/smooth-scroll.js" defer></script>
+    <style>
+        /* Tool Card Enhanced Styles */
+        .tool-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3);
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tool-card:hover::before {
+            opacity: 1;
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .tool-icon-img {
+            width: 32px;
+            height: 32px;
+            filter: var(--tool-card-icon-filter, drop-shadow(0 0 5px rgba(99, 102, 241, 0.5)));
+        }
+
+        .tool-title {
+            margin: 0;
+            font-size: 1.25rem;
+            background: var(--tool-title-gradient, linear-gradient(to right, #fff, #94a3b8));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--text-primary); /* Fallback */
+        }
+
+        .tool-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        
+        .tool-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        /* Inputs */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .text-input, .select-input, .textarea-input, .file-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--input-bg, rgba(0, 0, 0, 0.2));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: monospace;
+        }
+
+        .textarea-input {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+
+        .text-input:focus, .select-input:focus, .textarea-input:focus {
+            border-color: var(--accent-blue);
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        /* Preview Areas */
+        .preview-box {
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255,255,255,0.03),
+                rgba(255,255,255,0.03) 10px,
+                rgba(255,255,255,0.05) 10px,
+                rgba(255,255,255,0.05) 20px
+            );
+            border-radius: var(--border-radius);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed var(--glass-border);
+            position: relative;
+        }
+
+        .preview-box img {
+            max-width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .qr-output-bg {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem auto;
+        }
+
+        .hidden { display: none !important; }
+        
+        .output-wrapper { position: relative; }
+
+        /* Color Preview */
+        .color-preview {
+            width: 100%;
+            height: 40px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--glass-border);
+            margin-top: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        /* --- Navigation Menu --- */
+        .tool-nav {
+            position: fixed;
+            right: 1.5rem; /* Slightly reduced margin to avoid overflow */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 90; /* Lower z-index to sit behind overlays if needed, but above cards */
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.5rem; /* Reduced padding */
+            border-radius: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 90vh; /* Prevent overflow on small vertical screens */
+            overflow-y: auto; /* Allow scrolling within nav if needed */
+            scrollbar-width: none; /* Hide scrollbar */
+        }
+        
+        .tool-nav::-webkit-scrollbar { display: none; }
+
+        /* Ensure container has padding-right to prevent overlap */
+        .container {
+            padding-right: 5rem; /* Add space for the sidebar */
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                padding-right: var(--spacing-xl); /* Reset padding on mobile */
+            }
+        }
+
+        .nav-item {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item:hover, .nav-item.active, .nav-item.hover-sync {
+            background: var(--accent-blue);
+            transform: scale(1.15);
+            box-shadow: 0 0 15px var(--accent-blue-glow);
+        }
+
+        .nav-item img {
+            width: 22px;
+            height: 22px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            transition: filter 0.3s;
+        }
+        
+        .nav-item:hover img, .nav-item.active img, .nav-item.hover-sync img {
+            filter: brightness(0) invert(1);
+        }
+
+        /* Tooltip */
+        .nav-item::before {
+            content: attr(data-title);
+            position: absolute;
+            right: 60px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+            transform: translateX(10px);
+        }
+
+        .nav-item:hover::before {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Mobile FAB */
+        .nav-toggle {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .tool-nav {
+                position: fixed;
+                bottom: 6rem;
+                right: 1.5rem;
+                top: auto;
+                transform: translateY(20px) scale(0.9);
+                flex-direction: column-reverse;
+                background: rgba(15, 23, 42, 0.9);
+                opacity: 0;
+                pointer-events: none;
+                transform-origin: bottom right;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            }
+
+            .tool-nav.open {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateY(0) scale(1);
+            }
+            
+            .nav-item::before {
+                right: 55px;
+            }
+
+            .nav-toggle {
+                display: flex;
+                position: fixed;
+                bottom: 1.5rem;
+                right: 1.5rem;
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                background: var(--gradient-primary);
+                z-index: 101;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+                border: none;
+                cursor: pointer;
+                transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .nav-toggle svg {
+                width: 28px;
+                height: 28px;
+                color: white;
+                transition: transform 0.3s;
+            }
+
+            .nav-toggle.active {
+                transform: rotate(90deg);
+            }
+            
+            .nav-toggle.active svg {
+                transform: rotate(45deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Quick Navigation -->
+        <nav class="tool-nav" id="tool-nav">
+            <a href="#tool-image" class="nav-item" data-title="图片转换">
+                <img src="assets/icons/Image_format_conversion.svg" alt="Img">
+            </a>
+            <a href="#tool-qr" class="nav-item" data-title="二维码">
+                <img src="assets/icons/QRCode.svg" alt="QR">
+            </a>
+            <a href="#tool-timestamp" class="nav-item" data-title="时间戳">
+                <img src="assets/icons/clock.svg" alt="Time">
+            </a>
+            <a href="#tool-json" class="nav-item" data-title="JSON工具">
+                <img src="assets/icons/json.svg" alt="JSON">
+            </a>
+            <a href="#tool-base64" class="nav-item" data-title="Base64">
+                <img src="assets/icons/text-tool.svg" alt="Text">
+            </a>
+            <a href="#tool-url" class="nav-item" data-title="URL编码">
+                <img src="assets/icons/link.svg" alt="Link">
+            </a>
+            <a href="#tool-color" class="nav-item" data-title="颜色转换">
+                <img src="assets/icons/palette.svg" alt="Color">
+            </a>
+            <a href="#tool-password" class="nav-item" data-title="密码生成">
+                <img src="assets/icons/lock.svg" alt="Lock">
+            </a>
+            <a href="#tool-lorem" class="nav-item" data-title="文本生成">
+                <img src="assets/icons/paragraph.svg" alt="Txt">
+            </a>
+        </nav>
+
+        <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Menu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+
+        <h1 class="section-title">开发者工具箱</h1>
+        <p style="text-align: center; margin-bottom: 3rem; color: var(--text-secondary);">
+            <span style="color: var(--accent-blue);">●</span> 本地运行
+            <span style="color: var(--accent-blue); margin: 0 0.5rem;">●</span> 数据安全
+            <span style="color: var(--accent-blue); margin: 0 0.5rem;">●</span> 极速响应
+        </p>
+
+        <div class="grid grid-3">
+            
+            <!-- 1. Image Converter -->
+            <div class="card glass tool-card" id="tool-image">
+                <div class="tool-header">
+                    <div class="tool-icon-wrapper">
+                        <img src="assets/icons/Image_format_conversion.svg" alt="Image" class="tool-icon-img">
+                    </div>
+                    <div>
+                        <h3 class="tool-title">图片转换</h3>
+                    </div>
+                </div>
+                <p class="tool-desc">PNG / JPG / WEBP / BMP / ICO 格式互转，支持质量调节。</p>
+                
+                <div class="tool-content">
+                    <input type="file" id="img-upload" accept="image/*" class="file-input">
+                    
+                    <div id="img-controls" class="hidden" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="btn-row">
+                            <select id="img-format" class="select-input" style="flex:2;">
+                                <option value="image/png">PNG</option>
+                                <option value="image/jpeg">JPG</option>
+                                <option value="image/webp">WEBP</option>
+                                <option value="image/bmp">BMP</option>
+                                <option value="image/x-icon">ICO</option>
+                            </select>
+                            <input type="number" id="img-quality" class="text-input" value="0.9" step="0.1" min="0.1" max="1" style="flex:1;" title="质量 (0-1)">
+                        </div>
+                        <button id="img-convert-btn" class="btn btn-primary" style="width: 100%;">转换并下载</button>
+                    </div>
+
+                    <div id="img-preview" class="preview-box hidden"></div>
+                </div>
+            </div>
+
+            <!-- 2. QR Code -->
+            <div class="card glass tool-card" id="tool-qr">
+                <div class="tool-header">
+                    <div class="tool-icon-wrapper">
+                        <img src="assets/icons/QRCode.svg" alt="QR" class="tool-icon-img">
+                    </div>
+                    <div>
+                        <h3 class="tool-title">二维码生成</h3>
+                    </div>
+                </div>
+                <p class="tool-desc">生成可自定义颜色的高清二维码图片。</p>
+                
+                <div class="tool-content">
+                    <input type="text" id="qr-text" placeholder="输入链接或文本" class="text-input">
+                    <div class="btn-row" style="align-items: center;">
+                        <input type="color" id="qr-color-dark" value="#000000" style="height: 38px; flex:1; cursor: pointer; border:none; padding:0; background:none;">
+                        <input type="color" id="qr-color-light" value="#ffffff" style="height: 38px; flex:1; cursor: pointer; border:none; padding:0; background:none;">
+                        <button id="qr-gen-btn" class="btn btn-primary" style="flex:2;">生成</button>
+                    </div>
+                    
+                    <div id="qr-container" class="preview-box hidden">
+                        <div id="qr-output" class="qr-output-bg"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Timestamp -->
+            <div class="card glass tool-card" id="tool-timestamp">
+                <div class="tool-header">
+                    <div class="tool-icon-wrapper">
+                        <img src="assets/icons/clock.svg" alt="Time" class="tool-icon-img">
+                    </div>
+                    <div>
+                        <h3 class="tool-title">时间戳转换</h3>
+                    </div>
+                </div>
+                <p class="tool-desc">Unix 时间戳与日期时间互转。</p>
+                
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label class="input-label">当前时间戳 (ms)</label>
+                        <div class="output-wrapper">
+                            <input type="text" id="ts-now" class="text-input" readonly>
+                            <button class="copy-btn" onclick="copyToClipboard('ts-now')">复制</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">时间戳转日期</label>
+                        <div class="btn-row">
+                            <input type="text" id="ts-input" class="text-input" placeholder="输入时间戳">
+                            <button id="ts-to-date-btn" class="btn btn-outline">转换</button>
+                        </div>
+                        <input type="text" id="ts-date-output" class="text-input" readonly placeholder="结果...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. JSON Tool -->
+            <div class="card glass tool-card" id="tool-json">
+                <div class="tool-header">
+                    <div class="tool-icon-wrapper">
+                        <img src="assets/icons/json.svg" alt="JSON" class="tool-icon-img">
+                    </div>
+                    <div>
+                        <h3 class="tool-title">JSON 工具</h3>
+                    </div>
+                </div>
+                <p class="tool-desc">格式化、压缩与校验 JSON 数据。</p>
+                
+                <div class="tool-content">
+                    <textarea id="json-input" class="textarea-input" placeholder="粘贴 JSON..."></textarea>
+                    <div class="btn-row">
+                        <button id="json-fmt-btn" class="btn btn-outline" style="flex:1;">美化</button>
+                        <button id="json-minify-btn" class="btn btn-outline" style="flex:1;">压缩</button>
+                    </div>
+                    <div class="output-wrapper">
+                         <textarea id="json-output" class="textarea-input" placeholder="结果..." readonly></textarea>
+                         <button class="copy-btn" onclick="copyToClipboard('json-output')">复制</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Base64 -->
+            <div class="card glass tool-card" id="tool-base64">
+                <div class="tool-header">
+                    <div class="tool-icon-wrapper">
+                        <img src="assets/icons/text-tool.svg" alt="Base64" class="tool-icon-img">
+                    </div>
+                    <div>
+                        <h3 class="tool-title">Base64 转换</h3>
+                    </div>
+                </div>
+                <p class="tool-desc">文本与 Base64 编码互转，支持中文。</p>
+                
+                <div class="tool-content">
+                    <textarea id="b64-input" class="textarea-input" placeholder="输入内容..."></textarea>
+                    <div class="btn-row">
+                        <button id="b64-encode-btn" class="btn btn-outline" style="flex:1;">编码</button>
+                        <button id="b64-decode-btn" class="btn btn-outline" style="flex:1;">解码</button>
+                    </div>
+                    <div class="output-wrapper">
+                        <textarea id="b64-output" class="textarea-input" placeholder="结果..." readonly></textarea>
+                        <button class="copy-btn" onclick="copyToClipboard('b64-output')">复制</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. URL Encode -->
+            <div class="card glass tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon-wrapper">
+                        <img src="assets/icons/link.svg" alt="URL" class="tool-icon-img">
+                    </div>
+                    <div>
+                        <h3 class="tool-title">URL 编解码</h3>
+                    </div>
+                </div>
+                <p class="tool-desc">URL 参数转义与还原。</p>
+                
+                <div class="tool-content">
+                    <textarea id="url-input" class="textarea-input" placeholder="输入 URL..."></textarea>
+                    <div class="btn-row">
+                        <button id="url-encode-btn" class="btn btn-outline" style="flex:1;">编码</button>
+                        <button id="url-decode-btn" class="btn btn-outline" style="flex:1;">解码</button>
+                    </div>
+                    <div class="output-wrapper">
+                        <textarea id="url-output" class="textarea-input" placeholder="结果..." readonly></textarea>
+                        <button class="copy-btn" onclick="copyToClipboard('url-output')">复制</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. Color Converter -->
+            <div class="card glass tool-card" id="tool-color">
+                <div class="tool-header">
+                    <div class="tool-icon-wrapper">
+                        <img src="assets/icons/palette.svg" alt="Color" class="tool-icon-img">
+                    </div>
+                    <div>
+                        <h3 class="tool-title">颜色转换</h3>
+                    </div>
+                </div>
+                <p class="tool-desc">HEX 与 RGB 格式互转。</p>
+                
+                <div class="tool-content">
+                    <div class="input-group">
+                        <input type="text" id="color-input" class="text-input" placeholder="输入 HEX (#fff) 或 RGB (255,255,255)">
+                    </div>
+                    <button id="color-convert-btn" class="btn btn-outline">转换</button>
+                    <div class="output-wrapper">
+                        <input type="text" id="color-output" class="text-input" readonly placeholder="结果...">
+                        <button class="copy-btn" onclick="copyToClipboard('color-output')">复制</button>
+                    </div>
+                    <div id="color-preview-box" class="color-preview"></div>
+                </div>
+            </div>
+
+            <!-- 8. Password Generator -->
+            <div class="card glass tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon-wrapper">
+                        <img src="assets/icons/lock.svg" alt="Pwd" class="tool-icon-img">
+                    </div>
+                    <div>
+                        <h3 class="tool-title">密码生成器</h3>
+                    </div>
+                </div>
+                <p class="tool-desc">生成高强度随机密码。</p>
+                
+                <div class="tool-content">
+                    <div class="btn-row" style="align-items: center;">
+                        <label class="input-label" style="flex:1;">长度: <span id="pwd-len-val">16</span></label>
+                        <input type="range" id="pwd-len" min="6" max="64" value="16" style="flex:2;">
+                    </div>
+                    <button id="pwd-gen-btn" class="btn btn-primary">生成密码</button>
+                    <div class="output-wrapper">
+                        <input type="text" id="pwd-output" class="text-input" readonly>
+                        <button class="copy-btn" onclick="copyToClipboard('pwd-output')">复制</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. Lorem Ipsum -->
+            <div class="card glass tool-card" id="tool-lorem">
+                <div class="tool-header">
+                    <div class="tool-icon-wrapper">
+                        <img src="assets/icons/paragraph.svg" alt="Lorem" class="tool-icon-img">
+                    </div>
+                    <div>
+                        <h3 class="tool-title">文本生成</h3>
+                    </div>
+                </div>
+                <p class="tool-desc">生成 Lorem Ipsum 占位文本。</p>
+                
+                <div class="tool-content">
+                    <div class="btn-row">
+                        <button onclick="genLorem(1)" class="btn btn-outline" style="flex:1;">1句</button>
+                        <button onclick="genLorem(3)" class="btn btn-outline" style="flex:1;">3句</button>
+                        <button onclick="genLorem(5)" class="btn btn-outline" style="flex:1;">5句</button>
+                    </div>
+                    <div class="output-wrapper">
+                        <textarea id="lorem-output" class="textarea-input" readonly placeholder="点击按钮生成..." style="height: 150px;"></textarea>
+                        <button class="copy-btn" onclick="copyToClipboard('lorem-output')">复制</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Navigation Logic ---
+        const navToggle = document.getElementById('nav-toggle');
+        const toolNav = document.getElementById('tool-nav');
+        
+        navToggle.addEventListener('click', () => {
+            navToggle.classList.toggle('active');
+            toolNav.classList.toggle('open');
+        });
+
+        // Close menu when clicking a link (mobile)
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if(window.innerWidth <= 1024) {
+                    navToggle.classList.remove('active');
+                    toolNav.classList.remove('open');
+                }
+            });
+        });
+
+        // Scroll Spy
+        const sections = document.querySelectorAll('.tool-card');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href').slice(1) === current) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Hover Interaction Sync
+        sections.forEach(section => {
+            section.addEventListener('mouseenter', () => {
+                const id = section.getAttribute('id');
+                navItems.forEach(item => {
+                    item.classList.remove('hover-sync'); // Remove previous sync class
+                    if (item.getAttribute('href').slice(1) === id) {
+                        item.classList.add('hover-sync');
+                    }
+                });
+            });
+            
+            section.addEventListener('mouseleave', () => {
+                navItems.forEach(item => item.classList.remove('hover-sync'));
+            });
+        });
+
+        // --- Helper: Copy ---
+        function copyToClipboard(elementId) {
+            const el = document.getElementById(elementId);
+            el.select();
+            document.execCommand('copy');
+            const btn = el.nextElementSibling;
+            const originalText = btn.textContent;
+            btn.textContent = '已复制!';
+            btn.style.background = 'var(--accent-green)';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 1500);
+        }
+
+        // --- 1. Image Converter ---
+        const imgUpload = document.getElementById('img-upload');
+        const imgControls = document.getElementById('img-controls');
+        const imgPreview = document.getElementById('img-preview');
+        const imgConvertBtn = document.getElementById('img-convert-btn');
+        let currentImg = null;
+
+        imgUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    currentImg = img;
+                    imgControls.classList.remove('hidden');
+                    imgPreview.innerHTML = '';
+                    img.style.maxWidth = '100%';
+                    imgPreview.appendChild(img);
+                    imgPreview.classList.remove('hidden');
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        imgConvertBtn.addEventListener('click', () => {
+            if (!currentImg) return;
+            const canvas = document.createElement('canvas');
+            canvas.width = currentImg.width;
+            canvas.height = currentImg.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(currentImg, 0, 0);
+            
+            const format = document.getElementById('img-format').value;
+            const quality = parseFloat(document.getElementById('img-quality').value);
+            const dataUrl = canvas.toDataURL(format, quality);
+            
+            let ext = format.split('/')[1];
+            if(ext === 'x-icon') ext = 'ico';
+
+            const link = document.createElement('a');
+            link.download = `converted.${ext}`;
+            link.href = dataUrl;
+            link.click();
+        });
+
+        // --- 2. QR Code ---
+        document.getElementById('qr-gen-btn').addEventListener('click', () => {
+            const text = document.getElementById('qr-text').value.trim();
+            if (!text) return;
+            const container = document.getElementById('qr-output');
+            container.innerHTML = '';
+            document.getElementById('qr-container').classList.remove('hidden');
+            try {
+                new QRCode(container, {
+                    text: text,
+                    width: 200,
+                    height: 200,
+                    colorDark : document.getElementById('qr-color-dark').value,
+                    colorLight : document.getElementById('qr-color-light').value,
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            } catch (e) { container.textContent = 'Err'; }
+        });
+
+        // --- 3. Timestamp ---
+        setInterval(() => {
+            document.getElementById('ts-now').value = Date.now();
+        }, 1000);
+
+        document.getElementById('ts-to-date-btn').addEventListener('click', () => {
+            let val = document.getElementById('ts-input').value.trim();
+            if(!val) return;
+            // Guess if seconds or ms
+            if(val.length === 10) val *= 1000;
+            const date = new Date(parseInt(val));
+            document.getElementById('ts-date-output').value = date.toLocaleString();
+        });
+
+        // --- 4. JSON ---
+        const jsonIn = document.getElementById('json-input');
+        const jsonOut = document.getElementById('json-output');
+        document.getElementById('json-fmt-btn').addEventListener('click', () => {
+            try { jsonOut.value = JSON.stringify(JSON.parse(jsonIn.value), null, 2); } 
+            catch (e) { jsonOut.value = "Invalid JSON"; }
+        });
+        document.getElementById('json-minify-btn').addEventListener('click', () => {
+            try { jsonOut.value = JSON.stringify(JSON.parse(jsonIn.value)); } 
+            catch (e) { jsonOut.value = "Invalid JSON"; }
+        });
+
+        // --- 5. Base64 & 6. URL ---
+        const b64In = document.getElementById('b64-input');
+        const b64Out = document.getElementById('b64-output');
+        document.getElementById('b64-encode-btn').addEventListener('click', () => {
+            try { b64Out.value = btoa(unescape(encodeURIComponent(b64In.value))); } catch(e){ b64Out.value = "Err"; }
+        });
+        document.getElementById('b64-decode-btn').addEventListener('click', () => {
+            try { b64Out.value = decodeURIComponent(escape(atob(b64In.value))); } catch(e){ b64Out.value = "Err"; }
+        });
+
+        const urlIn = document.getElementById('url-input');
+        const urlOut = document.getElementById('url-output');
+        document.getElementById('url-encode-btn').addEventListener('click', () => urlOut.value = encodeURIComponent(urlIn.value));
+        document.getElementById('url-decode-btn').addEventListener('click', () => urlOut.value = decodeURIComponent(urlIn.value));
+
+        // --- 7. Color Converter ---
+        document.getElementById('color-convert-btn').addEventListener('click', () => {
+            const val = document.getElementById('color-input').value.trim();
+            const out = document.getElementById('color-output');
+            const preview = document.getElementById('color-preview-box');
+            
+            // Simple Hex to RGB
+            if(val.startsWith('#')) {
+                let r=0, g=0, b=0;
+                if(val.length == 4) {
+                    r = parseInt(val[1]+val[1], 16);
+                    g = parseInt(val[2]+val[2], 16);
+                    b = parseInt(val[3]+val[3], 16);
+                } else if (val.length == 7) {
+                    r = parseInt(val.substring(1,3), 16);
+                    g = parseInt(val.substring(3,5), 16);
+                    b = parseInt(val.substring(5,7), 16);
+                }
+                out.value = `rgb(${r}, ${g}, ${b})`;
+                preview.style.backgroundColor = val;
+            } 
+            // Simple RGB to Hex
+            else if (val.toLowerCase().startsWith('rgb')) {
+                const parts = val.match(/\d+/g);
+                if(parts && parts.length >= 3) {
+                    const toHex = (c) => {
+                        const hex = parseInt(c).toString(16);
+                        return hex.length == 1 ? "0" + hex : hex;
+                    };
+                    const hex = "#" + toHex(parts[0]) + toHex(parts[1]) + toHex(parts[2]);
+                    out.value = hex;
+                    preview.style.backgroundColor = hex;
+                }
+            } else {
+                out.value = "格式不支持";
+            }
+        });
+
+        // --- 8. Password Generator ---
+        const pwdLen = document.getElementById('pwd-len');
+        pwdLen.addEventListener('input', (e) => document.getElementById('pwd-len-val').textContent = e.target.value);
+        
+        document.getElementById('pwd-gen-btn').addEventListener('click', () => {
+            const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+            const len = parseInt(pwdLen.value);
+            let pwd = "";
+            for(let i=0; i<len; i++) {
+                pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('pwd-output').value = pwd;
+        });
+
+        // --- 9. Lorem Ipsum ---
+        const loremText = [
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+            "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        ];
+        function genLorem(count) {
+            let res = "";
+            for(let i=0; i<count; i++) {
+                res += loremText[i % loremText.length] + " ";
+            }
+            document.getElementById('lorem-output').value = res;
+        }
+    </script>
+</body>
+</html>

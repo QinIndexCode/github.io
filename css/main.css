@@ -757,7 +757,7 @@ a {
         bottom: 0;
         width: 280px;
         transform: translateX(-100%); /* 初始隐藏 */
-        background: rgba(11, 12, 21, 0.95);
+        background: var(--bg-secondary); /* Dynamic background */
         backdrop-filter: blur(20px);
         border-right: 1px solid var(--glass-border);
         box-shadow: none;
